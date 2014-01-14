@@ -297,8 +297,14 @@ class OffsetIndex(@volatile var file: File, val baseOffset: Long, val maxIndexSi
    */
   private def forceUnmap(m: MappedByteBuffer) {
     try {
-      if(m.isInstanceOf[sun.nio.ch.DirectBuffer])
-        (m.asInstanceOf[sun.nio.ch.DirectBuffer]).cleaner().clean()
+      if(m.isInstanceOf[sun.nio.ch.DirectBuffer]) {
+        var cl = (m.asInstanceOf[sun.nio.ch.DirectBuffer]).cleaner()
+
+        /* if cl != null, then we call it */
+        if (cl != null) {
+          cl.clean()
+        }
+      }
     } catch {
       case t: Throwable => warn("Error when freeing index buffer", t)
     }
@@ -332,6 +338,9 @@ class OffsetIndex(@volatile var file: File, val baseOffset: Long, val maxIndexSi
   /** Close the index */
   def close() {
     trimToValidSize()
+
+    /* forcefully free the MappedByteBuffer */
+    forceUnmap(this.mmap)
   }
   
   /**
