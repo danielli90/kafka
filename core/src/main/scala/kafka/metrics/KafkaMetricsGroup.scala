@@ -43,7 +43,7 @@ trait KafkaMetricsGroup extends Logging {
     val pkg = if (klass.getPackage == null) "" else klass.getPackage.getName
     val simpleName = klass.getSimpleName.replaceAll("\\$$", "")
 
-    explicitMetricName(pkg, simpleName, name, tags)
+    explicitMetricName("\"" + pkg + "\"", "\"" + simpleName + "\"", "\"" + name + "\"", tags)
   }
 
 
